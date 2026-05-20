@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>カブトガニ検定 - 干潟の古代生物クイズ</title>
+  <style>
+    :root{
+      --bg:#081417;
+      --panel:#10262b;
+      --panel2:#16363c;
+      --accent:#74d0c4;
+      --accent2:#ffd166;
+      --danger:#ff6b6b;
+      --ok:#8ee28e;
+      --text:#eefbfb;
+      --muted:#a6c9c8;
+      --shadow: 0 18px 50px rgba(0,0,0,.35);
+      --radius:22px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(116,208,196,.22), transparent 28%),
+        radial-gradient(circle at 80% 20%, rgba(255,209,102,.14), transparent 25%),
+        linear-gradient(145deg,#061012,#0b1a1f 45%,#081417);
+      color:var(--text);
+      overflow-x:hidden;
+    }
+    .shell-bg{
+      position:fixed;
+      inset:auto -80px -110px auto;
+      width:360px;
+      height:360px;
+      border-radius:50% 50% 42% 42%;
+      border:2px solid rgba(116,208,196,.15);
+      background:radial-gradient(circle at 50% 35%,rgba(116,208,196,.12),transparent 55%);
+      transform:rotate(-18deg);
+      pointer-events:none;
+      filter:blur(.2px);
+    }
+    .shell-bg:before,.shell-bg:after{
+      content:"";
+      position:absolute;
+      background:rgba(116,208,196,.12);
+    }
+    .shell-bg:before{width:240px;height:3px;left:60px;top:178px;transform:rotate(90deg)}
+    .shell-bg:after{width:20px;height:220px;left:170px;top:300px;border-radius:20px}
+    .wrap{
+      width:min(1050px,94vw);
+      margin:0 auto;
+      padding:28px 0 60px;
+    }
+    header{
+      display:flex;
+      gap:18px;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:20px;
+    }
+    .title-card{
+      padding:22px 24px;
+      border:1px solid rgba(116,208,196,.22);
+      background:linear-gradient(135deg,rgba(16,38,43,.92),rgba(9,25,29,.86));
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      flex:1;
+    }
+    h1{
+      margin:0 0 8px;
+      font-size:clamp(28px,5vw,52px);
+      letter-spacing:.04em;
+      line-height:1.05;
+    }
+    .subtitle{color:var(--muted);line-height:1.7;font-size:15px}
+    .badge{
+      display:inline-flex;
+      gap:7px;
+      align-items:center;
+      padding:7px 12px;
+      background:rgba(255,209,102,.14);
+      border:1px solid rgba(255,209,102,.36);
+      color:#ffe8a3;
+      border-radius:999px;
+      font-size:13px;
+      margin-bottom:12px;
+      font-weight:700;
+    }
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:12px;
+      margin:18px 0;
+    }
+    .stat{
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.09);
+      border-radius:18px;
+      padding:13px;
+      text-align:center;
+    }
+    .stat b{font-size:24px;color:var(--accent2)}
+    .stat span{display:block;color:var(--muted);font-size:12px;margin-top:3px}
+    .main{
+      display:grid;
+      grid-template-columns:1.08fr .92fr;
+      gap:18px;
+    }
+    .card{
+      background:linear-gradient(180deg,rgba(16,38,43,.94),rgba(10,24,28,.94));
+      border:1px solid rgba(116,208,196,.18);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:20px;
+    }
+    .mode-grid{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:12px;
+      margin-top:14px;
+    }
+    button{
+      appearance:none;
+      border:0;
+      border-radius:18px;
+      padding:14px 16px;
+      min-height:48px;
+      color:var(--text);
+      background:linear-gradient(135deg,rgba(116,208,196,.25),rgba(116,208,196,.08));
+      border:1px solid rgba(116,208,196,.32);
+      font-weight:800;
+      font-size:15px;
+      cursor:pointer;
+      touch-action:manipulation;
+      transition:transform .12s ease, border-color .12s ease, background .12s ease;
+    }
+    button:hover{transform:translateY(-1px);border-color:rgba(255,209,102,.6)}
+    button:active{transform:translateY(1px) scale(.99)}
+    .secondary{background:rgba(255,255,255,.055);border-color:rgba(255,255,255,.14);color:#e6ffff}
+    .danger{background:rgba(255,107,107,.16);border-color:rgba(255,107,107,.32)}
+    .question-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:14px;
+    }
+    .pill{
+      border-radius:999px;
+      padding:8px 12px;
+      background:rgba(255,255,255,.07);
+      color:var(--muted);
+      font-size:13px;
+      font-weight:700;
+      white-space:nowrap;
+    }
+    .qtext{
+      font-size:clamp(20px,3.3vw,31px);
+      line-height:1.35;
+      margin:12px 0 18px;
+      font-weight:900;
+      letter-spacing:.01em;
+    }
+    .visual{
+      min-height:150px;
+      border-radius:20px;
+      background:linear-gradient(180deg,rgba(116,208,196,.12),rgba(255,255,255,.035));
+      border:1px solid rgba(116,208,196,.14);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      margin:12px 0 16px;
+      position:relative;
+    }
+    .visual svg{width:min(500px,92%);height:145px}
+    .choices{display:grid;gap:10px}
+    .choice{
+      width:100%;
+      text-align:left;
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      justify-content:flex-start;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.13);
+      line-height:1.55;
+      font-weight:760;
+    }
+    .choice .mark{
+      flex:0 0 auto;
+      width:28px;height:28px;border-radius:50%;
+      display:inline-flex;align-items:center;justify-content:center;
+      background:rgba(116,208,196,.16);
+      color:var(--accent2);
+    }
+    .choice.correct{background:rgba(142,226,142,.16);border-color:rgba(142,226,142,.55)}
+    .choice.wrong{background:rgba(255,107,107,.14);border-color:rgba(255,107,107,.5)}
+    .explain{
+      margin-top:14px;
+      padding:14px;
+      border-radius:17px;
+      background:rgba(0,0,0,.22);
+      border:1px solid rgba(255,255,255,.1);
+      color:#d7f4f3;
+      line-height:1.75;
+      display:none;
+    }
+    .explain.show{display:block}
+    .controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+    .progress{
+      height:12px;
+      border-radius:999px;
+      background:rgba(255,255,255,.08);
+      overflow:hidden;
+      margin:8px 0 14px;
+    }
+    .bar{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .3s ease}
+    .rank{
+      font-size:28px;
+      font-weight:950;
+      color:var(--accent2);
+      margin:6px 0;
+    }
+    .small{color:var(--muted);font-size:13px;line-height:1.7}
+    .log{display:grid;gap:8px;max-height:340px;overflow:auto;padding-right:4px}
+    .log-item{
+      padding:10px 12px;
+      border-radius:14px;
+      background:rgba(255,255,255,.045);
+      border:1px solid rgba(255,255,255,.08);
+      line-height:1.5;
+      font-size:13px;
+    }
+    .hidden{display:none!important}
+    .tag{display:inline-block;margin-right:6px;color:#071417;background:var(--accent2);border-radius:999px;padding:2px 8px;font-weight:900;font-size:12px}
+    @media(max-width:820px){
+      header{display:block}
+      .main{grid-template-columns:1fr}
+      .stats{grid-template-columns:repeat(3,1fr)}
+      .mode-grid{grid-template-columns:1fr}
+      .card{padding:16px}
+      .choice{font-size:14px;padding:13px}
+    }
+  </style>
+</head>
+<body>
+  <div class="shell-bg"></div>
+  <div class="wrap">
+    <header>
+      <div class="title-card">
+        <div class="badge">🦀 干潟・古生物・医薬品検査まで</div>
+        <h1>カブトガニ検定</h1>
+        <div class="subtitle">“生きた化石”という一言では終わらない。分類、生態、繁殖地、保全、LAL試験まで、妙に実務的でマニアックな4択クイズです。</div>
+      </div>
+    </header>
+
+    <div class="stats">
+      <div class="stat"><b id="score">0</b><span>得点</span></div>
+      <div class="stat"><b id="streak">0</b><span>連続正解</span></div>
+      <div class="stat"><b id="remain">-</b><span>残り問題</span></div>
+    </div>
+
+    <div class="main">
+      <section class="card" id="startPanel">
+        <h2>検定モードを選択</h2>
+        <p class="small">最初は「研究員見習い」でも十分難しめです。特級は選択肢がかなり紛らわしいです。</p>
+        <div class="mode-grid">
+          <button onclick="startGame('easy')">3級：研究員見習い</button>
+          <button onclick="startGame('normal')">2級：干潟調査員</button>
+          <button onclick="startGame('hard')">1級：保全・分類マニア</button>
+          <button onclick="startGame('extreme')">特級：LAL・古生物・天然記念物</button>
+        </div>
+        <div class="visual" aria-hidden="true">
+          <svg viewBox="0 0 640 220">
+            <defs>
+              <linearGradient id="g" x1="0" x2="1"><stop stop-color="#74d0c4"/><stop offset="1" stop-color="#ffd166"/></linearGradient>
+            </defs>
+            <path d="M105 108 C132 20 286 8 373 36 C469 67 530 143 494 181 C454 225 232 212 139 172 C105 157 95 139 105 108Z" fill="rgba(116,208,196,.18)" stroke="url(#g)" stroke-width="5"/>
+            <path d="M312 170 C328 215 335 260 342 318" stroke="#ffd166" stroke-width="8" stroke-linecap="round"/>
+            <path d="M150 132 C220 93 332 84 462 125" stroke="rgba(238,251,251,.32)" stroke-width="3" fill="none"/>
+            <circle cx="245" cy="82" r="8" fill="#eefbfb"/><circle cx="356" cy="82" r="8" fill="#eefbfb"/>
+            <path d="M172 172 C130 195 92 198 65 185 M222 187 C176 215 135 220 104 205 M421 184 C468 210 507 213 542 195 M468 160 C514 181 552 178 578 158" stroke="rgba(116,208,196,.55)" stroke-width="7" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </section>
+
+      <section class="card hidden" id="quizPanel">
+        <div class="question-head">
+          <span class="pill" id="modeLabel">---</span>
+          <span class="pill" id="qCount">0 / 0</span>
+        </div>
+        <div class="progress"><div class="bar" id="bar"></div></div>
+        <div class="qtext" id="question">---</div>
+        <div class="visual" id="visual"></div>
+        <div class="choices" id="choices"></div>
+        <div class="explain" id="explain"></div>
+        <div class="controls">
+          <button id="nextBtn" onclick="nextQuestion()" class="hidden">次の問題へ</button>
+          <button onclick="restart()" class="secondary">モード選択へ戻る</button>
+        </div>
+      </section>
+
+      <aside class="card">
+        <h2>現在の判定</h2>
+        <div class="rank" id="rank">未受験</div>
+        <p class="small" id="rankText">モードを選ぶと検定開始。正解すると“干潟知識”が上がります。</p>
+        <h3>解答ログ</h3>
+        <div class="log" id="log"><div class="log-item">まだ解答はありません。</div></div>
+      </aside>
+    </div>
+  </div>
+
+<script>
+const visuals = {
+  shell: `<svg viewBox="0 0 640 220"><path d="M105 108 C132 20 286 8 373 36 C469 67 530 143 494 181 C454 225 232 212 139 172 C105 157 95 139 105 108Z" fill="rgba(116,208,196,.18)" stroke="#74d0c4" stroke-width="5"/><path d="M312 170 C328 215 335 260 342 318" stroke="#ffd166" stroke-width="8" stroke-linecap="round"/><circle cx="245" cy="82" r="8" fill="#eefbfb"/><circle cx="356" cy="82" r="8" fill="#eefbfb"/><path d="M172 172 C130 195 92 198 65 185 M222 187 C176 215 135 220 104 205 M421 184 C468 210 507 213 542 195 M468 160 C514 181 552 178 578 158" stroke="rgba(116,208,196,.55)" stroke-width="7" stroke-linecap="round"/></svg>`,
+  mudflat: `<svg viewBox="0 0 640 220"><path d="M0 145 C80 120 147 171 220 145 C300 116 369 162 442 137 C520 110 570 130 640 112 L640 220 L0 220Z" fill="rgba(255,209,102,.2)"/><path d="M30 170 C110 150 190 190 280 164 C370 138 450 178 610 142" fill="none" stroke="rgba(255,209,102,.45)" stroke-width="5"/><circle cx="110" cy="98" r="28" fill="rgba(116,208,196,.22)" stroke="#74d0c4"/><path d="M106 120 C113 140 118 156 122 178" stroke="#ffd166" stroke-width="5" stroke-linecap="round"/></svg>`,
+  blood: `<svg viewBox="0 0 640 220"><path d="M302 38 C250 100 230 125 230 160 C230 200 262 220 303 220 C344 220 376 200 376 160 C376 124 354 99 302 38Z" fill="rgba(116,208,196,.24)" stroke="#74d0c4" stroke-width="6"/><circle cx="304" cy="160" r="48" fill="rgba(116,208,196,.18)"/><path d="M410 75 L515 75 L515 181 L410 181Z" fill="rgba(255,255,255,.08)" stroke="#ffd166" stroke-width="4"/><path d="M430 160 L495 160" stroke="#ffd166" stroke-width="8"/></svg>`,
+  fossil: `<svg viewBox="0 0 640 220"><rect x="70" y="45" width="500" height="130" rx="38" fill="rgba(255,255,255,.06)" stroke="rgba(255,209,102,.55)"/><path d="M180 105 C220 55 330 58 390 82 C450 107 480 145 442 158 C390 177 250 166 190 143 C170 135 166 122 180 105Z" fill="rgba(255,209,102,.14)" stroke="#ffd166" stroke-width="5"/><path d="M320 145 C330 180 332 194 336 210" stroke="#ffd166" stroke-width="5" stroke-linecap="round"/></svg>`
+};
+
+const bank = [
+  {lv:['easy'], cat:'分類', v:'shell', q:'カブトガニは名前に「カニ」とありますが、分類上いちばん近い説明はどれ？', a:1, c:['十脚目の甲殻類で、ズワイガニに近い','鋏角類に属し、クモやサソリ側に近い節足動物','魚類に近い古代型の甲殻魚','軟体動物で、貝殻が変形した仲間'], e:'カブトガニは一般的なカニとは別系統で、鋏角類の節足動物です。名前の印象だけで選ぶと引っかかります。'},
+  {lv:['easy'], cat:'形態', v:'shell', q:'カブトガニの長い尾のような部分について、最も適切なのはどれ？', a:2, c:['毒針で、捕食者を刺すための器官','泳ぐための主エンジンで、魚の尾びれに相当する','ひっくり返った時に体勢を戻すのにも使う尾剣','卵を産みつけるためだけの産卵管'], e:'尾剣は毒針ではありません。体勢を戻すなど、姿勢制御に関わる重要な部位です。'},
+  {lv:['easy'], cat:'生息環境', v:'mudflat', q:'日本のカブトガニ保全で特に重要な環境はどれ？', a:0, c:['産卵できる砂浜・干潟・浅海域が連続する沿岸環境','水深1000m以上の深海底','流れの速い山間部の渓流','完全に淡水化したため池'], e:'カブトガニは沿岸の浅い海や干潟、産卵に適した砂質の場所と深く関係します。'},
+  {lv:['easy'], cat:'保全', v:'mudflat', q:'岡山県笠岡市で知られるカブトガニ関連施設はどれ？', a:3, c:['カブトガニ水族科学校','瀬戸内古代魚センター','干潟ロボット館','笠岡市立カブトガニ博物館'], e:'笠岡市立カブトガニ博物館は、カブトガニをテーマにした非常に珍しい専門施設です。'},
+  {lv:['easy','normal'], cat:'俗称', v:'fossil', q:'カブトガニが「生きた化石」と呼ばれる主な理由として、最も近いものは？', a:1, c:['化石から直接復元された人工生物だから','古い時代からの特徴をよく残した姿をしているから','現代では骨格だけで生活しているから','恐竜と同じ爬虫類だから'], e:'“生きた化石”は、古い系統や形態的特徴を長く残している生物に使われる表現です。'},
+
+  {lv:['normal'], cat:'生活史', v:'mudflat', q:'カブトガニの幼生が成長するうえで、干潟が重要になる理由として最も適切なのは？', a:2, c:['強い波で常に遠洋へ流される必要があるため','完全な淡水に一度入らないと脱皮できないため','浅く餌が得やすく、隠れ場にもなる底質環境があるため','サンゴ礁の枝に固定して育つため'], e:'幼生にとって、浅場・干潟の底質や餌環境は重要です。埋立や護岸で環境が変わると影響が出ます。'},
+  {lv:['normal'], cat:'医薬品検査', v:'blood', q:'カブトガニ類の血液成分が医薬品分野で注目された理由は？', a:0, c:['細菌由来エンドトキシンの検出に利用できる反応を示すため','抗生物質そのものを大量に作るため','血液がそのままワクチンとして使えるため','赤血球が人間の血液型判定に使えるため'], e:'LAL試験は、カブトガニ類の血球成分を利用してエンドトキシンを検出する考え方です。'},
+  {lv:['normal'], cat:'体色', v:'blood', q:'カブトガニ類の血液が青く見える理由として最も近いものは？', a:3, c:['海水の青色が透けているだけ','葉緑素を持つため','赤血球が存在しないから必ず透明になるため','銅を含むヘモシアニン系の酸素運搬色素が関係するため'], e:'哺乳類のヘモグロビンとは異なり、ヘモシアニンが酸素運搬に関係します。'},
+  {lv:['normal'], cat:'天然記念物', v:'mudflat', q:'「カブトガニ繁殖地」として国指定天然記念物で知られる笠岡市の水域は？', a:1, c:['淀川河口','神島水道','東京湾奥部','琵琶湖沖合'], e:'笠岡市の神島水道は、国指定天然記念物のカブトガニ繁殖地として知られます。'},
+  {lv:['normal','hard'], cat:'生態', v:'shell', q:'カブトガニの食性として最も自然なのはどれ？', a:0, c:['海底の小動物や有機物を食べる底生寄りの食性','大型魚だけを追いかけて捕食する高速遊泳性','木の実だけを食べる完全な草食性','光合成で栄養を得る独立栄養性'], e:'カブトガニは海底に関係する餌を利用します。見た目は甲冑風ですが、サメのような高速捕食者ではありません。'},
+
+  {lv:['hard'], cat:'分類', v:'shell', q:'「カブトガニをカニの仲間」と断定する説明が危ない理由は？', a:2, c:['カブトガニは魚類なので、甲殻類ですらないから','カブトガニは昆虫綱なので、脚が6本だから','和名にカニと付くが、十脚目のカニ類とは分類が異なるから','カブトガニは哺乳類で、胎生だから'], e:'カニという名前は形の印象に近く、分類上のカニ類とは別です。検定ではここが超基本の落とし穴です。'},
+  {lv:['hard'], cat:'保全実務', v:'mudflat', q:'カブトガニ保全で「成体だけを放流すれば解決」と言い切れない理由として最も良いものは？', a:3, c:['成体はすべて淡水でしか生きられないため','放流すれば必ずその場で繁殖するため、理由はない','カブトガニは人工飼育が法律で完全義務化されているため','産卵場・幼生の育つ干潟・水質など、生活史全体の環境が必要なため'], e:'生物保全は個体数だけでなく、繁殖できる環境と幼生が育つ環境の維持が重要です。'},
+  {lv:['hard'], cat:'LAL', v:'blood', q:'LAL試験の説明として最も正確に近いものは？', a:1, c:['カブトガニの殻を粉末にし、塩分濃度を測る試験','カブトガニ類のアメボサイト由来成分を用い、エンドトキシン反応を調べる試験','カブトガニの尾剣を電極にしてpHを測る試験','カブトガニの卵を培地に混ぜ、抗体価を直接測る試験'], e:'LALは Limulus Amebocyte Lysate の略で、細菌エンドトキシン検出に関係する試験として知られます。'},
+  {lv:['hard'], cat:'比較', v:'fossil', q:'「カブトガニは恐竜より古い」と言う時、注意すべき表現はどれ？', a:0, c:['現生個体が恐竜時代から一匹ずつ生き続けている、という意味ではない','恐竜の直接の祖先という意味である','恐竜と同じ爬虫類に含めるという意味である','恐竜化石の中から必ずカブトガニが出るという意味である'], e:'古い系統・形態の話と、個体寿命の話は別です。ここを混同すると雑な説明になります。'},
+  {lv:['hard'], cat:'解剖', v:'shell', q:'カブトガニの体の大きな区分として最もそれらしい組み合わせは？', a:2, c:['頭・胸・腹の昆虫型3区分だけ','頭足部・外套膜・貝殻','前体・後体・尾剣','頭部・胴体・背びれ・尾びれ'], e:'ざっくり見るなら前体、後体、尾剣という捉え方がしやすいです。昆虫の3区分とは違います。'},
+
+  {lv:['extreme'], cat:'分類特級', v:'shell', q:'次のうち、カブトガニの分類説明として最も事故が少ないものは？', a:1, c:['甲殻亜門・十脚目・短尾下目に属するため、分類学上も典型的なカニである','節足動物のうち鋏角類側に置かれ、一般的なカニ類とは別系統である','脊索動物門に属し、硬い甲羅を持つ原始的な魚類である','軟体動物門に属し、背甲は二枚貝の片側が変形したものである'], e:'「鋏角類」「カニ類ではない」を両方押さえた選択肢が正解です。'},
+  {lv:['extreme'], cat:'医薬品特級', v:'blood', q:'エンドトキシン検査の文脈で、rFCが話題になる理由として最も近いものは？', a:3, c:['カブトガニの尾剣を再生医療に使うため','LALよりも必ず全ての条件で感度がゼロになるため','血液を青色に染める観賞用試薬だから','カブトガニ類由来成分への依存を減らし得る組換えFactor C系の代替法だから'], e:'rFCは recombinant Factor C。持続可能性や特異性などの観点でLAL代替として議論されます。'},
+  {lv:['extreme'], cat:'保全特級', v:'mudflat', q:'カブトガニの地域個体群保全で、もっとも筋の悪い評価はどれ？', a:0, c:['成体の目撃例だけで十分。産卵確認や幼生環境は見なくてよい','産卵場、幼生の生息場、底質、水質、人為改変を総合的に見る','護岸・埋立・干潟の分断が生活史に与える影響を見る','短期の個体数だけでなく、再生産の有無を確認する'], e:'成体だけを見ても、次世代が育っているとは限りません。再生産と幼生環境が非常に重要です。'},
+  {lv:['extreme'], cat:'天然記念物特級', v:'mudflat', q:'「神島水道のカブトガニ繁殖地」という言い方で重要なのはどれ？', a:2, c:['カブトガニという動物そのものだけでなく、恐竜公園全体が天然記念物という意味','淡水湖の中央部が指定対象という意味','繁殖地という“場”の保護が重要で、環境ごと守る発想につながる','海外から輸入した個体の展示ケース名である'], e:'天然記念物の繁殖地指定は、個体だけでなく繁殖の場を守る発想と相性が良いです。'},
+  {lv:['extreme'], cat:'ひっかけ', v:'fossil', q:'「カブトガニは変わっていない」と説明する時、研究・教育的に一番無難な言い換えは？', a:1, c:['完全に進化を停止した生物である','古い系統の特徴を強く残している、と表現する','DNA配列が古生代から完全一致している','すべての現生種が同じ場所に同じ数だけ残っている'], e:'“進化していない”は誤解を招きます。特徴を残す、形態が保守的、などの表現が無難です。'},
+  {lv:['extreme'], cat:'実務判断', v:'blood', q:'品質管理担当者が「LALはカブトガニ血液を使うから、試験液を患者に注射している」と説明した。どこがまずい？', a:3, c:['LAL試験は海水の塩分を測るだけなので、医薬品とは無関係','LALはカブトガニの甲羅の硬度測定であり、血液成分は使わない','患者にカブトガニを投与する治療法を意味する','試験対象サンプルに試薬を反応させる検査であり、患者へ投与する話とは別'], e:'LALは検査・試験の文脈です。患者にカブトガニ成分を入れるという説明は大きな誤解です。'}
+];
+
+let questions=[], index=0, score=0, streak=0, answered=false, mode='';
+const modeNames={easy:'3級：研究員見習い',normal:'2級：干潟調査員',hard:'1級：保全・分類マニア',extreme:'特級：LAL・古生物・天然記念物'};
+
+function shuffle(arr){return [...arr].sort(()=>Math.random()-0.5)}
+function startGame(selected){
+  mode=selected;
+  questions=shuffle(bank.filter(x=>x.lv.includes(selected)));
+  index=0; score=0; streak=0; answered=false;
+  document.getElementById('startPanel').classList.add('hidden');
+  document.getElementById('quizPanel').classList.remove('hidden');
+  document.getElementById('log').innerHTML='';
+  updateStats(); showQuestion(); updateRank();
+}
+function showQuestion(){
+  answered=false;
+  const q=questions[index];
+  document.getElementById('modeLabel').textContent=modeNames[mode];
+  document.getElementById('qCount').textContent=`${index+1} / ${questions.length}`;
+  document.getElementById('bar').style.width=`${(index/questions.length)*100}%`;
+  document.getElementById('question').innerHTML=`<span class="tag">${q.cat}</span>${q.q}`;
+  document.getElementById('visual').innerHTML=visuals[q.v]||visuals.shell;
+  document.getElementById('explain').classList.remove('show');
+  document.getElementById('explain').textContent='';
+  document.getElementById('nextBtn').classList.add('hidden');
+  const choices=document.getElementById('choices');
+  choices.innerHTML='';
+  q.c.forEach((text,i)=>{
+    const btn=document.createElement('button');
+    btn.className='choice';
+    btn.innerHTML=`<span class="mark">${['A','B','C','D'][i]}</span><span>${text}</span>`;
+    btn.addEventListener('click',()=>answer(i));
+    btn.addEventListener('touchend',(ev)=>{ev.preventDefault(); answer(i);},{passive:false});
+    choices.appendChild(btn);
+  });
+  updateStats();
+}
+function answer(i){
+  if(answered) return;
+  answered=true;
+  const q=questions[index];
+  const buttons=[...document.querySelectorAll('.choice')];
+  buttons.forEach((b,n)=>{
+    if(n===q.a) b.classList.add('correct');
+    if(n===i && i!==q.a) b.classList.add('wrong');
+  });
+  const ok=i===q.a;
+  if(ok){score+=10+(streak*2); streak++;} else {streak=0;}
+  document.getElementById('explain').innerHTML=`<b>${ok?'正解！':'不正解…'}</b><br>${q.e}`;
+  document.getElementById('explain').classList.add('show');
+  document.getElementById('nextBtn').classList.remove('hidden');
+  addLog(ok,q);
+  updateStats(); updateRank();
+  if(index===questions.length-1){document.getElementById('nextBtn').textContent='結果を見る';}
+}
+function nextQuestion(){
+  if(index<questions.length-1){index++; document.getElementById('nextBtn').textContent='次の問題へ'; showQuestion();}
+  else {finish();}
+}
+function finish(){
+  const max=questions.length*10 + Math.max(0,questions.length-1)*2;
+  const rate=Math.round(score/max*100);
+  document.getElementById('question').textContent='検定終了！';
+  document.getElementById('visual').innerHTML=visuals.fossil;
+  document.getElementById('choices').innerHTML='';
+  document.getElementById('bar').style.width='100%';
+  document.getElementById('explain').innerHTML=`最終スコア：<b>${score}</b>点 / 達成率：約<b>${rate}%</b><br>${finalComment(rate)}`;
+  document.getElementById('explain').classList.add('show');
+  document.getElementById('nextBtn').classList.add('hidden');
+  document.getElementById('qCount').textContent=`完了`;
+  updateRank(rate);
+}
+function finalComment(rate){
+  if(rate>=90) return 'あなたはもう「干潟の古代生物担当」を名乗って大丈夫です。かなり強いです。';
+  if(rate>=70) return 'かなり理解できています。LAL・分類・保全をもう少し詰めると特級が見えます。';
+  if(rate>=45) return '生きた化石イメージは掴めています。分類と保全のひっかけに注意！';
+  return 'まずは「カニではない」「干潟が重要」「血液成分が検査に関係」の3点から攻略しましょう。';
+}
+function addLog(ok,q){
+  const log=document.getElementById('log');
+  const div=document.createElement('div');
+  div.className='log-item';
+  div.innerHTML=`${ok?'✅':'❌'} <b>${q.cat}</b>：${q.q}`;
+  log.prepend(div);
+}
+function updateStats(){
+  document.getElementById('score').textContent=score;
+  document.getElementById('streak').textContent=streak;
+  document.getElementById('remain').textContent=questions.length? Math.max(questions.length-index-1,0):'-';
+}
+function updateRank(rate=null){
+  let r='未受験', t='モードを選ぶと検定開始。';
+  if(questions.length){
+    const raw=rate===null ? Math.min(100,Math.round(score / Math.max(1,(index+1)*12)*100)) : rate;
+    if(raw>=90){r='特級：カブトガニ博士';t='分類・保全・LALまでかなり強いです。'}
+    else if(raw>=70){r='1級：干潟調査員';t='かなり良い理解です。ひっかけ耐性もあります。'}
+    else if(raw>=45){r='2級：生きた化石ウォッチャー';t='基本は掴めています。分類問題を固めましょう。'}
+    else {r='3級：甲羅観察スタート';t='ここから伸びます。まずはカニではない点が重要！'}
+  }
+  document.getElementById('rank').textContent=r;
+  document.getElementById('rankText').textContent=t;
+}
+function restart(){
+  document.getElementById('quizPanel').classList.add('hidden');
+  document.getElementById('startPanel').classList.remove('hidden');
+  questions=[]; index=0; score=0; streak=0; answered=false;
+  document.getElementById('log').innerHTML='<div class="log-item">まだ解答はありません。</div>';
+  document.getElementById('nextBtn').textContent='次の問題へ';
+  updateStats(); updateRank();
+}
+updateStats();
+</script>
+</body>
+</html>
